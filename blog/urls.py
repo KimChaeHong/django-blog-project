@@ -1,10 +1,20 @@
+# urls.py
 from django.urls import path
 from . import views
 
 urlpatterns = [
-   path('', views.board, name='board'),
-   path('write/', views.board_write, name='board_write'),
    path('login/', views.board_login, name='board_login'), 
    path('logout/', views.board_logout, name='board_logout'), 
-   path('board_detail/', views.board_detail, name= 'board_detail'),
+   
+   path('', views.board, name='board'),
+   path('topic/<int:topic>/', views.board, name='board_topic'),
+
+   path('write/', views.create_or_update_post, name='board_write'),
+   path('edit_post/<int:post_id>/', views.create_or_update_post, name='board_write'),
+   
+   path('image-upload/', views.image_upload.as_view(), name='image_upload'),
+
+   path('board_detail/<int:post_id>/', views.board_detail, name= 'board_detail'),
+   # 답변 url 추가 (9/17 수정완료)
+   # path('answer/create/<int:post_id>/', views.answer_create, name='answer_create'),
 ]
