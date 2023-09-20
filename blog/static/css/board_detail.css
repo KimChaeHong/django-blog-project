@@ -75,7 +75,7 @@ h5 {
 .post-content img {
   display: block;
   max-width: -webkit-fill-available;
-  padding: 40px 0;
+  margin: 40px 0;
   object-fit: cover;
 
 }
@@ -108,7 +108,35 @@ h5 {
 .edit-button {
   background: #E1E0DB;
 }
-
+.edit-comment-button {
+  background: #E1E0DB;
+  border-radius: 3px;
+  padding: 7px 16px;
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 25px;
+  width: 70px;
+  height: 25px;
+  flex-shrink: 0;
+}
+.delete-comment-button{
+  background: #1E1E1E;
+  color: #F9F8F4;
+  border-radius: 3px;
+  padding: 7px 16px;
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 25px;
+  width: 70px;
+  height: 25px;
+  flex-shrink: 0;
+}
 
 .edit-button, .delete-button, .share-button{
   border-radius: 3px;
@@ -153,15 +181,16 @@ a {
 .recommend-box a {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
   font-weight: 700;
   font-size: 18px;
 }
 
 .recommend-box {
   margin-top: 32px;
-  padding: 8px;
+  padding:8px;
   border: 1px solid #dbdbdb;
+  
 }
 
 .recommend-box:hover {
@@ -172,7 +201,12 @@ a {
 }
 
 .recommend-box img {
+  min-height: 10rem;
   width: 100%;
-  object-fit: cover;
   height: 100%;
+  flex-shrink: 0;
+  object-fit: cover;    /* Makes the image cover the container without distortion */
+  object-position: center;  
+  margin-left: auto; /* These two margin properties */
+  margin-right: auto; /* will horizontally center the image */
 }

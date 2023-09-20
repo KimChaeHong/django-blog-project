@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Website</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/navbar_black.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css" />
 </head>
 <body>
     <nav class="nav-bar">
@@ -16,26 +17,45 @@
                 <img src="{% static 'img/myLOG_black.png' %}" alt="로고" class="top-logo">
             </a>
             
+            <!-- 검색 폼 추가 -->
+            <form method="GET" action="{% url 'board' %}" class="search-form">
+                <div class = 'search_box_area'>
+                    <input class = 'search_box' id = 'search' type="text" name="search" placeholder="검색">
+                        <div id="search_box_btn">
+                            <input class="search_box_icon" type="image" src="{% static 'img/search.png' %}">
+                        </div>
+                </div>
+            </form>
 
             <!-- 오른쪽 버튼 영역 -->  
             <div class="nav-buttons">
                 <!-- 필터링 된 토픽 표시 9/16 수정 -->
-                <a href="{% url 'board_topic' topic=1 %}" class="primary-button {% if current_topic == 1 %}active{% endif %}">일상</a>
-                <a href="{% url 'board_topic' topic=2 %}" class="primary-button {% if current_topic == 2 %}active{% endif %}">요리</a>
-                <a href="{% url 'board_topic' topic=3 %}" class="primary-button {% if current_topic == 3 %}active{% endif %}">영화</a>
-                <a href="{% url 'board_topic' topic=4 %}" class="primary-button {% if current_topic == 4 %}active{% endif %}">여행</a>
-                <a href="{% url 'board_topic' topic=5 %}" class="primary-button {% if current_topic == 5 %}active{% endif %}">IT</a>
-                <div class="row-box">
-                    <!-- 로그인/로그아웃 버튼 -->
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'board_logout' %}" class="primary-button logout-button">Logout</a>
-                        <a href="{% url 'board_write' %}" style = "background-color: white; color:black;" class="primary-button create-post-button">Just Write!</a>
-                    {% else %}
-                        <a href="{% url 'board_login' %}" style = "background-color: white; color:black;" class="primary-button">Login</a>
-                    {% endif %}
-                </div>
+                <ul class='nav-links'>
+                    <li><a href="{% url 'board_topic' topic=1 %}" class="primary-button {% if current_topic == 1 %}active{% endif %}">일상</a></li>
+                    <li><a href="{% url 'board_topic' topic=2 %}" class="primary-button {% if current_topic == 2 %}active{% endif %}">요리</a></li>
+                    <li><a href="{% url 'board_topic' topic=3 %}" class="primary-button {% if current_topic == 3 %}active{% endif %}">영화</a></li>
+                    <li><a href="{% url 'board_topic' topic=4 %}" class="primary-button {% if current_topic == 4 %}active{% endif %}">여행</a></li>
+                    <li><a href="{% url 'board_topic' topic=5 %}" class="primary-button {% if current_topic == 5 %}active{% endif %}">IT</a></li>
+                    <li><a href="{% url 'board_topic' topic=6 %}" class="primary-button {% if current_topic == 6 %}active{% endif %}">애완동물</a></li>
+                    <div class="row-box">
+                        <!-- 로그인/로그아웃 버튼 -->
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'board_logout' %}" class="primary-button logout-button">Logout</a>
+                            <a href="{% url 'board_write' %}" style = "background-color: white; color:black;" class="primary-button create-post-button">Just Write!</a>
+                        {% else %}
+                            <a href="{% url 'board_login' %}" style = "background-color: white; color:black;" class="primary-button">Login</a>
+                        {% endif %}
+                    </div>
+                </ul>
+
+                
             </div>
+
+            <a href="#" class="navbar__toggleBtn"> <i class="fas fa-bars" style='color:#fff'></i> </a>
+
         </div>
     </nav>
+
 </body>
+    <script src="{% static "js/nav.js" %}"></script>
 </html>

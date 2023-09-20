@@ -16,5 +16,10 @@ urlpatterns = [
 
    path('board_detail/<int:post_id>/', views.board_detail, name= 'board_detail'),
    # 답변 url 추가 (9/17 수정완료)
-   # path('answer/create/<int:post_id>/', views.answer_create, name='answer_create'),
+   path('comment/create/<int:post_id>/', views.comment_create, name='comment_create'),
+   path('comment/delete/<int:comment_id>/', views.comment_delete, name='comment_delete'),
+   path('comment/update/<int:comment_id>/', views.comment_update, name='comment_update'),
+   path('comment/check_password/<int:comment_id>/', views.check_comment_password, name='check_password'),
+
+   path('autocomplete/', views.autocomplete, name='autocomplete'),
 ]

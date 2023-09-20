@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -22,6 +21,7 @@
       type="text/css"
       href="{% static 'css/footer.css' %}"
     />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
     {% include 'nav_white.html' %}
@@ -44,8 +44,13 @@
             {% for recommended_post in recommended_posts %}
               <div class="recommend-box">
                 <a href="{% url 'board_detail' recommended_post.id %}">
-                  {% comment %} {{ recommended_post.image_tag|safe }} {% endcomment %}
-                  {{ recommended_post.title }}</a>
+                  {% if recommended_post.image_tag %}
+                    {{ recommended_post.image_tag|safe }}
+                  {% else %}
+                    <img src="{% static 'img/nophoto2.png' %}">
+                  {% endif %}
+                  <span style="display: block; text-align: center;">{{ recommended_post.title }}</span>
+                </a>
               </div>
             {% endfor %}
           </div>
@@ -53,7 +58,7 @@
       </div>
       <div class="button-box">
         {% if user.is_authenticated %}
-        <div class="box-divider" style="gap:10px">
+        <div class="box-divider" style="gap:20px">
             {% comment %} 수정버튼 {% endcomment %}
             <a href="{% url 'board_write' post.id %}">
               <button class="edit-button">수정하기</button>
@@ -104,50 +109,112 @@
       {% endif %}
 
     <!-- 답변 기능 추가 (9/17 추가완료)-->
-      <!-- 답변 -->
-    {% comment %} <h5 class="border-bottom my-3 py-2">{{post.answer_set.count}}개의 답변이 있습니다.</h5>
-    {% for answer in post.answer_set.all %}
-    <div class="card my-3">
-        <div class="card-body">
-            <div class="card-text" style="white-space: pre-line;">{{ answer.content }}</div>
-            <div class="d-flex justify-content-end">
-                <div class="badge bg-light text-dark p-2">
-                    {{ answer.create_date }}
+        <!-- 답변 -->
+    {% if post.comments.count is null %}
+    <h5 class="border-bottom my-3 py-2">0 개의 댓글이 있습니다.</h5>
+
+  {% else %}
+    <h5 class="border-bottom my-3 py-2">{{post.comments.count}} 개의 댓글이 있습니다.</h5>
+  {% endif %}
+  
+
+ 
+  {% for comment in post.comments.all %}
+  <div class="comment_container">
+      <div class="card my-3" style="border-bottom: 0.5px solid lightgray; padding-bottom: 1rem">
+          <div class="card-body">
+              <div class="card-text" style="white-space: pre-line;">{{ comment.author_name }}</div>
+              <div class="card-text" style="white-space: pre-line;">
+                  <span id="comment-content-{{ comment.id }}">{{ comment.content }}</span>
                 </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-      <!-- 답변 등록 -->
-    <form action="{% url 'answer_create' post.id %}" method="post" class="my-3">
-      {% csrf_token %}
-      <!-- 오류표시 Start -->
-      {% if form.errors %}
-      <div class="alert alert-danger" role="alert">
+              <div class="d-flex justify-content-end">
+                  <div class="badge bg-light text-dark p-2">{{ comment.create_date }}</div>
+              </div>
+          </div>
+      </div>
+      <div class="button-group d-flex" style="gap: 20px;">
+        <button class="edit-comment-button" data-comment-id="{{ comment.id }}">수정</button>
+        <button class="delete-comment-button" data-comment-id="{{ comment.id }}">삭제</button>
+        
+      </div>
+    
+      </br>
+      <form class="edit-comment-form" data-comment-id="{{ comment.id }}" style="display: none;" class="my-3">
+        {% csrf_token %}
+    
+        <!-- 오류표시 Start -->
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
           {% for field in form %}
           {% if field.errors %}
           <div>
-              <strong>{{ field.label }}</strong>
-              {{ field.errors }}
+            <strong>{{ field.label }}</strong>
+            {{ field.errors }}
           </div>
           {% endif %}
           {% endfor %}
+        </div>
+        {% endif %}
+        <!-- 오류표시 End -->
+        
+        <div class="form-group" style ='display:none;'>
+          <div class="row">
+            <div class="col-6">
+              <input type="text" name='author_name' id='comment' class="form-control" value="{{ comment.author_name }}">
+            </div>
+            <div class="col-6">
+              <input type="password" name='author_pw' id='comment' class="form-control" value="{{ comment.author_pw }}">
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <textarea name="content" id="content" class="form-control" rows="10" placeholder='내용을 입력하세요'>{{ form.content.value }}</textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="background-color: #000; border: none; margin-top: 10px; color: white">수정 완료</button>
+      </form>
+  </div>
+{% endfor %}
+
+ <!-- 답변 등록 -->
+ <form action="{% url 'comment_create' post.id %}" method="post" class="my-3">
+  {% csrf_token %}
+  <!-- 오류표시 Start -->
+  {% if form.errors %}
+  <div class="alert alert-danger" role="alert">
+      {% for field in form %}
+      {% if field.errors %}
+      <div>
+          <strong>{{ field.label }}</strong>
+          {{ field.errors }}
       </div>
       {% endif %}
-      <!-- 오류표시 End -->
-      <div class="form-group">
-          <textarea name="content" id="content" class="form-control" rows="10"></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary" style="background-color: #000; border: none; margin-top: 10px;">답변등록</button>
-  </form> {% endcomment %}
-  
+      {% endfor %}
+  </div>
+  {% endif %}
+  <!-- 오류표시 End -->
+  <div class="form-group">
+    <div class="row">
+        <div class="col-6">
+            <input type="text" name='author_name' id='comment' placeholder='이름을 입력하세요' class="form-control">
+        </div>
+        <div class="col-6">
+            <input type="password" name='author_pw' id='comment' placeholder='비밀번호 6자리를 입력하세요' class="form-control">
+        </div>
     </div>
+  </div>
+  <div class="form-group">
+    <textarea name="content" id="content" class="form-control" rows="10" placeholder='내용을 입력하세요'></textarea>
+  </div>
+    <button type="submit" class="btn btn-primary" style="background-color: #000; border: none; margin-top: 10px; color: white">답변등록</button>
+  </form>
+</div>
     <!-- footer 태그안으로 include 'footer'.html 로 수정 (9/15)-->
     <footer>
       {% include 'footer.html' %}
     </footer>
-
-  </body>
+</body>
   <script>
     // 공유하기 버튼 클릭 시
     document.querySelector('.share-button').addEventListener('click', function() {
@@ -164,5 +231,118 @@
       // 알림 표시
       alert('포스트 링크가 클립보드에 복사되었습니다');
     });
+    
+
+   // 댓글 수정
+  document.querySelectorAll('.edit-comment-button').forEach(function (button) {
+  button.addEventListener('click', function () {
+    // 수정 버튼을 누른 댓글의 ID를 가져옴
+    const commentId = button.getAttribute('data-comment-id');
+
+    // 사용자로부터 비밀번호를 입력받음 (예: prompt 대신 입력 폼을 사용하는 것이 좋습니다.)
+    const providedPassword = prompt('비밀번호를 입력하세요:');
+
+    // 입력한 비밀번호를 서버로 전송 (AJAX 요청)
+    fetch(`/comment/check_password/${commentId}/?author_pw=${providedPassword}`, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // 서버로부터의 응답을 처리
+        if (data.message === '비밀번호 일치') {
+          // 비밀번호가 일치할 때: 수정 폼을 표시하거나 기타 작업 수행
+          // 해당 댓글의 수정 폼을 표시
+               // 해당 댓글의 수정 폼을 표시
+               const editForm = document.querySelector(`.edit-comment-form[data-comment-id="${commentId}"]`);
+               editForm.style.display = 'block';
+               
+               // 해당 댓글의 내용을 가져와서 수정 폼에 채움
+               const commentContent = document.querySelector(`#comment-content-${commentId}`);
+               const contentTextarea = editForm.querySelector('textarea');
+               contentTextarea.value = commentContent.textContent.trim();
+               
+               // 수정 폼 제출 시 AJAX 요청
+               editForm.addEventListener('submit', function(event) {
+                   event.preventDefault();
+                   const formData = new FormData(editForm);
+                   fetch(`/comment/update/${commentId}/`, {
+                       method: 'POST',
+                       body: formData,
+                       headers: {
+                           'X-Requested-With': 'XMLHttpRequest',
+                           'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                       },
+                   })
+                   .then(response => response.json())
+                   .then(data => {
+                       // 수정된 내용을 댓글 내용에 반영
+                       commentContent.textContent = data.content;
+                       // 수정 폼을 숨김
+                       editForm.style.display = 'none';
+                   })
+                   .catch(error => {
+                       console.error('댓글 수정 실패:', error);
+                   });
+          });
+        } else {
+          // 비밀번호가 일치하지 않을 때: 오류 메시지를 표시하거나 다른 작업 수행
+          alert('비밀번호가 일치하지 않습니다.');
+        }
+      })
+      .catch((error) => {
+        console.error('비밀번호 확인 실패:', error);
+      });
+  });
+});
+
+  // 글 삭제 버튼 클릭 시 경고창이 뜨고 삭제되도록
+  document.querySelector('.delete-button').addEventListener('click', function (event) {
+    event.preventDefault(); // 기본 동작 방지 (폼 제출 등)
+    
+    // 확인 창을 띄우고 사용자의 선택을 확인
+    const isConfirmed = window.confirm('정말로 삭제하시겠습니까?');
+
+    if (isConfirmed) {
+      // 사용자가 확인을 선택한 경우, 삭제 동작 수행
+      const deleteForm = event.target.parentElement;
+      deleteForm.submit(); // 폼 제출 (삭제 동작)
+    }
+  });
+
+  // 댓글 삭제 시 경고창이 뜨고 삭제되도록
+  document.querySelectorAll('.delete-comment-button').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const commentId = button.getAttribute('data-comment-id');
+      
+      // 확인 대화 상자를 띄움
+      const confirmed = confirm('댓글을 삭제하시겠습니까?');
+      
+      // 사용자가 확인을 눌렀을 경우
+      if (confirmed) {
+        // 서버로 댓글 삭제 요청을 보냄
+        fetch(`/comment/delete/${commentId}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}', // CSRF 토큰을 적절히 설정
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.message === 'success') {
+              // 삭제 성공
+              alert('댓글이 삭제되었습니다.');
+              // 삭제 성공 시 페이지 새로고침
+              window.location.reload();
+            } else {
+              // 삭제 실패
+              alert('댓글 삭제에 실패했습니다.');
+            }
+          })
+          .catch((error) => {
+            console.error('댓글 삭제 요청 실패:', error);
+          });
+      }
+    });
+  });
   </script>
 </html>
